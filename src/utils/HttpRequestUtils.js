@@ -1,5 +1,8 @@
 import axios from 'axios';
-import ToastUtils from 'src/utils/ToastUtils';
+import {
+    Alert,
+    StyleSheet,
+} from 'react-native';
 
 const http = axios.create({
     timeout: 1000 * 30,
@@ -16,6 +19,7 @@ http.interceptors.request.use(config => {
     // config.headers['token'] = .cookie.get('token'); // 请求头带上token
     return config;
 }, error => {
+    Alert.alert(error)
     return Promise.reject(error);
 });
 
@@ -25,6 +29,7 @@ http.interceptors.request.use(config => {
 http.interceptors.response.use(response => {
     return response;
 }, error => {
+    Alert.alert(error)
     return Promise.reject(error);
 });
 

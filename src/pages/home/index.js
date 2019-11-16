@@ -22,7 +22,7 @@ import {BlurView} from '@react-native-community/blur';
 class Home extends Component {
     constructor(props) {
         super(props);
-        this.state = {viewRef: null};
+        this.state = {viewRef: null, refreshing: false};
     }
 
 
@@ -56,14 +56,14 @@ class Home extends Component {
                             title={'下拉刷新'}
                             refreshing={this.state.refreshing}
                             colors={['rgb(255, 176, 0)', '#ffb100']}
-                            onRefresh={() => {
-                                this.props.getCurrentPosition();
-                            }}
+                            onRefresh={this._onRefresh}
                         />
                     }>
                     <Header transparent>
                         <Left>
-                            <Button transparent>
+                            <Button onPress={() => {
+                                this.props.navigation.navigate('City')
+                            }} transparent>
                                 <Icon name='menu'/>
                             </Button>
                         </Left>
@@ -96,6 +96,13 @@ class Home extends Component {
             </View>
         );
     }
+
+    _onRefresh = () => {
+        this.setState({refreshing: true});
+        this.props.getCurrentPosition();
+        this.setState({refreshing: false});
+    };
+
 
     componentDidMount() {
         this.props.getCurrentPosition();

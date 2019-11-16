@@ -1,9 +1,10 @@
 import {createStackNavigator} from 'react-navigation-stack';
 import {createAppContainer} from 'react-navigation';
-import AppLaunch from '../pages/launch/AppLaunch';
-import Home from '../pages/home';
-import Test from '../pages/test';
-
+import AppLaunch from 'src/pages/launch/AppLaunch';
+import Home from 'src/pages/home';
+import City from 'src/pages/city';
+import Test from 'src/pages/test';
+import SearchCity from 'src/pages/city/components/SearchCity';
 
 const AppNavigator = createStackNavigator({
     AppLaunch: {
@@ -15,8 +16,14 @@ const AppNavigator = createStackNavigator({
     Test: {
         screen: Test,
     },
+    City: {
+        screen: City,
+    },
+    SearchCity: {
+        screen: SearchCity,
+    },
 }, {
-    initialRouteName: 'Home',
+    initialRouteName: 'Test',
     mode: 'modal',
     headerMode: 'none',
 });

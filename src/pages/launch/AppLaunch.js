@@ -8,7 +8,7 @@ export default class AppLaunch extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            backgroundImg: '',
+            backgroundImg: 'http',
             content: '',
             assignDate: '',
             translation: '',
@@ -40,11 +40,11 @@ export default class AppLaunch extends Component {
                     <View style={styles.contentContainer}>
                         <View style={styles.assignDateContainer}>
                             <Text
-                                style={[styles.assignDateText, styles.assignDateDayText]}>{new Date(this.state.assignDate).getDay()}</Text>
+                                style={[styles.assignDateText, styles.assignDateDayText]}>{this.state.assignDate ? new Date(this.state.assignDate).getDay() : ''}</Text>
                             <Text
                                 style={[styles.assignDateText]}>{this.state.assignDateMonth}.</Text>
                             <Text
-                                style={[styles.assignDateText]}>{new Date(this.state.assignDate).getFullYear()}</Text>
+                                style={[styles.assignDateText]}>{this.state.assignDate ? new Date(this.state.assignDate).getFullYear() : ''}</Text>
                         </View>
                         <Text style={styles.contentText}> {this.state.content}</Text>
                         <Text style={styles.contentText}>{this.state.translation}</Text>
@@ -62,6 +62,7 @@ export default class AppLaunch extends Component {
                 let data = res.data.data;
                 console.log(data);
                 let date = new Date(data.assignDate);
+                // setTimeout(() => {
                 this.setState({
                     backgroundImg: data.originImgUrls[0],
                     content: data.content,
@@ -69,6 +70,7 @@ export default class AppLaunch extends Component {
                     translation: data.translation,
                     assignDateMonth: date.toDateString().split(' ')[1],
                 });
+                // }, 0);
             }
         });
         this.timer = setInterval(() => {

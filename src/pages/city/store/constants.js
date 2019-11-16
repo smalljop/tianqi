@@ -1,0 +1,6 @@
+export const ADD_CURRENT_POSITION = 'home/ADD_CURRENT_POSITION';
+export const ADD_NOW_WEATHER = 'home/ADD_NOW_WEATHER';
+export const ADD_DAILY_FORECAST = 'home/ADD_DAILY_FORECAST';
+export const ADD_TODAY_LIFESTYLE = 'home/ADD_TODAY_LIFESTYLE';
+export const ADD_AIR_NOW_CITY = 'home/ADD_AIR_NOW_CITY';
+export const ADD_HOURLY_WEATHER = 'home/ADD_HOURLY_WEATHER';

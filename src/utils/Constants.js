@@ -8,4 +8,6 @@ export default {
         SCREEN_HEIGHT: Dimensions.get('window').height,
     },
 
+
+    hfWeatherKey: 'ddad161b09e64802916099a9cecfe28b',
 };
