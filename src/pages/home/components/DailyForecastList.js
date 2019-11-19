@@ -29,7 +29,7 @@ class DailyForecastList extends Component {
                 }}>未来7天预报</Text>
                 <View style={styles.container}>
                     {
-                        dailyForecastList.map((item, index) => {
+                        dailyForecastList ? dailyForecastList.map((item, index) => {
                             return (
                                 <View key={index} style={styles.dailyForecastListWrapper}>
                                     <Text style={{alignSelf: 'center'}}>
@@ -58,7 +58,7 @@ class DailyForecastList extends Component {
                                     </Text>
                                 </View>
                             );
-                        })
+                        }) : null
                     }
                 </View>
             </View>

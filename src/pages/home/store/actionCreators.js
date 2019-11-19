@@ -39,11 +39,7 @@ export const getCurrentPosition = () => {
                             formatted_address: result.regeocode.formatted_address,
                         };
                         dispatch(addCurrentPosition(geoPosition));
-                        dispatch(getNowWeather(newVar[0], newVar[1]));
-                        dispatch(getDailyForecastList(newVar[0], newVar[1]));
-                        dispatch(getLifestyle(newVar[0], newVar[1]));
-                        dispatch(getWeatherAir(newVar[0], newVar[1]));
-                        dispatch(getWeatherHourly(newVar[0], newVar[1]));
+                        dispatch(getAllWeatherInfo(newVar[0], newVar[1]));
                     });
                 });
             },
@@ -63,6 +59,22 @@ const addNowWeather = (result) => ({
     type: constants.ADD_NOW_WEATHER,
     nowWeather: result,
 });
+
+/**
+ * 获取天气全部信息
+ * @param longitude
+ * @param latitude
+ * @returns {Function}
+ */
+export const getAllWeatherInfo = (longitude, latitude) => {
+    return (dispatch) => {
+        dispatch(getNowWeather(longitude, latitude));
+        dispatch(getDailyForecastList(longitude, latitude));
+        dispatch(getLifestyle(longitude, latitude));
+        dispatch(getWeatherAir(longitude, latitude));
+        dispatch(getWeatherHourly(longitude, latitude));
+    };
+};
 
 /**
  * 获取现在天气
@@ -142,24 +154,25 @@ let weatherAirBaseUrl = 'https://api.heweather.net';
  * @returns {Function}
  */
 export const getWeatherAir = (longitude, latitude) => {
-    return (dispatch) => {
-        let airUrl = `${weatherAirBaseUrl}/s6/air/now?key=${weatherAirKey}&location=${longitude},${latitude}`;
-        http.get(airUrl).then((res) => {
-            let result = res.data.HeWeather6;
-            console.log(result);
-            if (result) {
-                result = result[0];
+        return (dispatch) => {
+            let airUrl = `${weatherAirBaseUrl}/s6/air/now?key=${weatherAirKey}&location=${longitude},${latitude}`;
+            http.get(airUrl).then((res) => {
+                let result = res.data.HeWeather6;
+                console.log(result);
                 if (result) {
-                    result = result.air_now_city;
+                    result = result[0];
+                    if (result) {
+                        result = result.air_now_city;
+                    }
                 }
-            }
-            dispatch({
-                type: constants.ADD_AIR_NOW_CITY,
-                airNowCity: result,
+                dispatch({
+                    type: constants.ADD_AIR_NOW_CITY,
+                    airNowCity: result,
+                });
             });
-        });
-    };
-};
+        };
+    }
+;
 
 /**
  * 逐小时天气

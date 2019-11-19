@@ -23,7 +23,7 @@ const AppNavigator = createStackNavigator({
         screen: SearchCity,
     },
 }, {
-    initialRouteName: 'Test',
+    initialRouteName: 'Home',
     mode: 'modal',
     headerMode: 'none',
 });

@@ -36,7 +36,7 @@ class Lifestyle extends Component {
         return (
             <View style={styles.container}>
                 {
-                    lifestyle.map((item, index) => {
+                    lifestyle ? lifestyle.map((item, index) => {
                         return (
                             <View key={index} style={{flex: 1, flexDirection: 'row'}}>
                                 <View style={{margin: 20}}>
@@ -52,7 +52,7 @@ class Lifestyle extends Component {
                                 </View>
                             </View>
                         );
-                    })
+                    }) : null
                 }
 
             </View>

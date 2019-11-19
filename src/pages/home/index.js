@@ -1,37 +1,36 @@
 import React, {Component} from 'react';
 import {
     View,
-    ScrollView,
-    Image,
-    findNodeHandle,
     StyleSheet,
-    RefreshControl,
+    Alert,
+    Image, findNodeHandle, Text,
 } from 'react-native';
 import {connect} from 'react-redux';
 import {actionCreators} from './store';
 import {Container, Header, Left, Body, Right, Button, Icon, Title} from 'native-base';
-import BasicWeather from './components/BasicWeather';
-import DailyForecastList from './components/DailyForecastList';
-import SunriseAndSunset from './components/SunriseAndSunset';
-import AirQuality from './components/AirQuality';
-import Lifestyle from './components/Lifestyle';
-import HourWeather from './components/HourWeather';
+import ScrollableTabView, {DefaultTabBar} from 'react-native-scrollable-tab-view';
+import WeatherPage from './components/WeatherPage';
 import {BlurView} from '@react-native-community/blur';
-
+import WeatherTabBar from 'src/components/weather/WeatherTabBar';
+import AsyncStorageUtils from 'src/utils/AsyncStorageUtils';
 
 class Home extends Component {
     constructor(props) {
         super(props);
-        this.state = {viewRef: null, refreshing: false};
+        this.state = {
+            viewRef: null,
+            refreshing: false,
+            currentCityIndex: 0,
+            cityList: [],
+            cityNumber: 0,
+            address: '',
+        };
     }
 
-
-    imageLoaded() {
-        this.setState({viewRef: findNodeHandle(this.backgroundImage)});
-    }
 
     render() {
-        let {geoPosition, nowWeather} = this.props;
+        let {geoPosition} = this.props;
+        let {cityList} = this.state;
         return (
             <View style={styles.container}>
                 <View style={styles.blurViewContainer}>
@@ -39,74 +38,103 @@ class Home extends Component {
                         ref={(img) => {
                             this.backgroundImage = img;
                         }}
-                        source={require('../../static/img/background.jpeg')}
-                        // style={styles.blurViewWrapper}
+                        source={require('src/static/img/background.png')}
+                        style={styles.blurViewWrapper}
                         onLoadEnd={this.imageLoaded.bind(this)}
                     />
                     {this.state.viewRef && <BlurView
                         style={styles.blurViewWrapper}
                         viewRef={this.state.viewRef}
                         blurType="light"
-                        blurAmount={10}/>}
+                        blurAmount={9}/>}
                 </View>
-                <ScrollView
-                    showsVerticalScrollIndicator={false}
-                    refreshControl={
-                        <RefreshControl
-                            title={'下拉刷新'}
-                            refreshing={this.state.refreshing}
-                            colors={['rgb(255, 176, 0)', '#ffb100']}
-                            onRefresh={this._onRefresh}
-                        />
-                    }>
+                <View style={{flex: 1}}>
                     <Header transparent>
                         <Left>
                             <Button onPress={() => {
-                                this.props.navigation.navigate('City')
+                                this.props.navigation.navigate('City');
                             }} transparent>
                                 <Icon name='menu'/>
                             </Button>
                         </Left>
-                        <Body>
-                            <Title>{geoPosition.addressComponent.district + '.' + geoPosition.addressComponent.township}</Title>
+                        <Body style={{alignItems: 'center'}}>
+                            <Title>{this.state.address}</Title>
                         </Body>
                         <Right>
-                            <Button transparent>
-                                <Icon name='arrow-back'/>
+                            <Button onPress={() => {
+                                console.log(this.state.cityList);
+                                Alert.alert(JSON.stringify(this.state.cityList));
+                            }} transparent>
+                                <Icon name='more'/>
                             </Button>
                         </Right>
                     </Header>
-                    <BasicWeather/>
-                    <View style={{height: 250}}>
-                        <HourWeather/>
-                    </View>
-                    <View style={{height: 300}}>
-                        <DailyForecastList/>
-                    </View>
-                    <View>
-                        <AirQuality/>
-                    </View>
-                    <View>
-                        <SunriseAndSunset/>
-                    </View>
-                    <View>
-                        <Lifestyle/>
-                    </View>
-                </ScrollView>
+                    <WeatherTabBar style={{height: 10}} activeIndex={this.state.currentCityIndex}
+                                   tabBarItemNumber={this.state.cityNumber + 1}/>
+                    <ScrollableTabView
+                        style={{marginTop: 20}}
+                        initialPage={0}
+                        renderTabBar={false}
+                        onChangeTab={(obj) => {
+                            const index = obj.i;
+                            let address = '';
+                            let city = null;
+                            if (cityList) {
+                                city = cityList[index - 1];
+                            }
+                            if (index == 0) {
+                                address = geoPosition.addressComponent.district + '.' + geoPosition.addressComponent.township;
+                                this.props.getAllWeatherInfo(geoPosition.longitude, geoPosition.latitude);
+                            } else {
+                                address = city ? city.location : '';
+                                if (city) {
+                                    this.props.getAllWeatherInfo(city.lon, city.lat);
+                                }
+                            }
+                            this.setState({
+                                currentCityIndex: index,
+                                address: address,
+                            });
+                        }}>
+                        <WeatherPage index={0}/>
+                        {
+                            cityList.map((item, index) => {
+                                return <WeatherPage index={index}/>;
+                            })
+                        }
+                    </ScrollableTabView>
+                </View>
             </View>
         );
     }
 
-    _onRefresh = () => {
-        this.setState({refreshing: true});
-        this.props.getCurrentPosition();
-        this.setState({refreshing: false});
-    };
-
 
     componentDidMount() {
-        this.props.getCurrentPosition();
+        this.didBlurSubscription = this.props.navigation.addListener(
+            'willFocus',
+            payload => {
+                this.props.getCurrentPosition();
+                AsyncStorageUtils.get('cityList').then(data => {
+                    this.setState({
+                        cityList: data,
+                        //保存城市+当前定位
+                        cityNumber: data.length,
+                    });
+                });
+            },
+        );
     }
+
+
+    componentWillUnmount() {
+        this.didBlurSubscription.remove();
+    }
+
+
+    imageLoaded() {
+        this.setState({viewRef: findNodeHandle(this.backgroundImage)});
+    }
+
 
 }
 
@@ -122,6 +150,9 @@ const mapDispatchToProps = dispatch => ({
     getNowWeather(longitude, latitude) {
         dispatch(actionCreators.getNowWeather(longitude, latitude));
     },
+    getAllWeatherInfo(longitude, latitude, index) {
+        dispatch(actionCreators.getAllWeatherInfo(longitude, latitude, index));
+    },
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);
@@ -129,7 +160,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(Home);
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        color: '#FFFFFF',
+        color: '#ffffff',
     },
     blurViewContainer: {
         justifyContent: 'center',
@@ -139,19 +170,5 @@ const styles = StyleSheet.create({
     blurViewWrapper: {
         position: 'absolute',
         top: 0, left: 0, bottom: 0, right: 0,
-    },
-    basicWeatherContainer: {
-        // flex: 1,
-        // flexDirection: 'row',
-        // alignSelf: 'center',
-        // height: 400,
-        // justifyContent: 'flex-start',//水平居中
-    },
-    dailyForecastListContainer: {
-        // flex: 1,
-        // marginTop: 190,
-        // flexDirection: 'row',
-        // alignSelf: 'center',
-        justifyContent: 'flex-start',//水平居中
     },
 });

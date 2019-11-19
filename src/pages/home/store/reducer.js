@@ -10,28 +10,7 @@ const defaultState = ({
         },
     },
     //当前天气
-    nowWeather: {
-        basic: {},
-        now: {
-            cloud: '0',
-            cond_code: '',
-            cond_txt: '',
-            fl: '',
-            hum: '',
-            pcpn: '0.0',
-            pres: '',
-            tmp: '',
-            vis: '',
-            wind_deg: '',
-            wind_dir: '',
-            wind_sc: '',
-            wind_spd: '',
-        },
-        update: {
-            loc: '',
-            utc: '',
-        },
-    },
+    nowWeather: {},
     //未来天气
     dailyForecastList: [],
     //生活指数
@@ -40,19 +19,8 @@ const defaultState = ({
     hourlyList: [],
 });
 
-// const addCurrentPosition = (state, action) => {
-//     let geoPosition = {
-//         formatted_address: action.geoPosition.regeocode.formatted_address,
-//     };
-//     return {
-//         ...state,
-//         geoPosition: geoPosition,
-//     };
-// };
 
 export default (state = defaultState, action) => {
-    console.log(action);
-    console.log(defaultState);
     switch (action.type) {
         case constants.ADD_CURRENT_POSITION:
             return {

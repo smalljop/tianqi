@@ -18,6 +18,9 @@ class BasicWeather extends Component {
 
     render() {
         let {geoPosition, nowWeather} = this.props;
+        if (!nowWeather.update) {
+            return null;
+        }
         return (
             <View style={styles.container}>
 
@@ -89,6 +92,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(BasicWeather);
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        color: '#FFFFFF',
     },
     updateTimeContainer: {
         height: 40,

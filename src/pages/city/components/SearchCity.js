@@ -50,7 +50,7 @@ class CityManager extends Component {
     render() {
         return (
             <Container style={{flex: 1}}>
-                <Header transparent searchBar rounded>
+                <Header searchBar rounded style={{paddingTop: 20, height: 76, backgroundColor: '#7BB2E1'}}>
                     <Item>
                         <Icon name="arrow-back" onPress={() => {
                             this.props.navigation.goBack();
@@ -77,10 +77,15 @@ class CityManager extends Component {
                                             if (!include) {
                                                 this.saveCity(ev, item);
                                             }
-                                        }} key={index} style={{margin: 5}} light
-                                                small>
+                                        }} key={index} transparent light small
+                                                style={{
+                                                    borderWidth: 0.1,
+                                                    borderColor: 'rgba(123,178,225,0.13)',
+                                                    margin: 5,
+                                                    backgroundColor: 'rgba(123,178,225,0.13)',
+                                                }}>
                                             <Text
-                                                style={{color: include ? '#0017EB' : '#000000'}}>{item.location}</Text>
+                                                style={{color: include ? '#00b4eb' : '#000000'}}>{item.location}</Text>
                                         </Button>
                                     );
                                 })
@@ -134,11 +139,11 @@ class CityManager extends Component {
     }
 
     cityInclude(cid) {
-        let city = this.state.cityList.find((item) => {
+        let city = this.state.cityList ? this.state.cityList.find((item) => {
             if (item.cid === cid) {
                 return true;
             }
-        });
+        }) : null;
         return city ? true : false;
     }
 
