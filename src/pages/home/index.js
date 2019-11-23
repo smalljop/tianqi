@@ -1,18 +1,18 @@
 import React, {Component} from 'react';
-import {
-    View,
-    StyleSheet,
-    Alert,
-    Image, findNodeHandle, Text,
-} from 'react-native';
+import {findNodeHandle, Image, StyleSheet, Text, TouchableOpacity, Alert, View} from 'react-native';
 import {connect} from 'react-redux';
-import {actionCreators} from './store';
-import {Container, Header, Left, Body, Right, Button, Icon, Title} from 'native-base';
-import ScrollableTabView, {DefaultTabBar} from 'react-native-scrollable-tab-view';
-import WeatherPage from './components/WeatherPage';
+
+import {Body, Button, Header, Icon, Left, Right, Title} from 'native-base';
+import ScrollableTabView from 'react-native-scrollable-tab-view';
 import {BlurView} from '@react-native-community/blur';
+import CodePush from 'react-native-code-push';
+import Modal from 'react-native-modal';
+import WeatherPage from './components/WeatherPage';
+import About from '../about/index';
 import WeatherTabBar from 'src/components/weather/WeatherTabBar';
+import {actionCreators} from './store';
 import AsyncStorageUtils from 'src/utils/AsyncStorageUtils';
+import Constants from 'src/utils/Constants';
 
 class Home extends Component {
     constructor(props) {
@@ -24,6 +24,8 @@ class Home extends Component {
             cityList: [],
             cityNumber: 0,
             address: '',
+            slideMoreMenuModal: false,
+            aboutModal: false,
         };
     }
 
@@ -48,6 +50,7 @@ class Home extends Component {
                         blurType="light"
                         blurAmount={9}/>}
                 </View>
+
                 <View style={{flex: 1}}>
                     <Header transparent>
                         <Left>
@@ -58,12 +61,14 @@ class Home extends Component {
                             </Button>
                         </Left>
                         <Body style={{alignItems: 'center'}}>
-                            <Title>{this.state.address}</Title>
+                            <Title>{this.state.address ? this.state.address :
+                                geoPosition.addressComponent.district + '.' + geoPosition.addressComponent.township}</Title>
                         </Body>
-                        <Right>
+                        <Right style={{position: 'relative'}}>
                             <Button onPress={() => {
-                                console.log(this.state.cityList);
-                                Alert.alert(JSON.stringify(this.state.cityList));
+                                this.setState({
+                                    slideMoreMenuModal: true,
+                                });
                             }} transparent>
                                 <Icon name='more'/>
                             </Button>
@@ -83,7 +88,6 @@ class Home extends Component {
                                 city = cityList[index - 1];
                             }
                             if (index == 0) {
-                                address = geoPosition.addressComponent.district + '.' + geoPosition.addressComponent.township;
                                 this.props.getAllWeatherInfo(geoPosition.longitude, geoPosition.latitude);
                             } else {
                                 address = city ? city.location : '';
@@ -96,14 +100,69 @@ class Home extends Component {
                                 address: address,
                             });
                         }}>
-                        <WeatherPage index={0}/>
+                        <WeatherPage longitude={geoPosition.longitude} latitude={geoPosition.latitude} index={0}/>
                         {
                             cityList.map((item, index) => {
-                                return <WeatherPage index={index}/>;
+                                return <WeatherPage key={index} longitude={item.lon} latitude={item.lat}
+                                                    index={index}/>;
                             })
                         }
                     </ScrollableTabView>
                 </View>
+                <Modal
+                    backdropColor='rgba(0, 0, 0, 0.1)'
+                    // coverScreen={true}
+                    style={{
+                        position: 'absolute',
+                        top: 10,
+                        right: 10,
+                    }}
+                    animationIn='slideInDown'
+                    onBackdropPress={() => {
+                        this.setState({
+                            slideMoreMenuModal: false,
+                        });
+                    }}
+                    isVisible={this.state.slideMoreMenuModal}>
+                    <View style={{
+                        backgroundColor: 'white',
+                        padding: 20,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        borderRadius: 4,
+                        borderColor: 'rgba(0, 0, 0, 0.1)',
+                    }}>
+                        <TouchableOpacity onPress={() => [
+                            Alert.alert('e'),
+                        ]}>
+                            <Text style={{fontSize: 15, lineHeight: 40}}>分享天气</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => {
+                            this.checkUpdate();
+                        }}>
+                            <Text style={{fontSize: 15, lineHeight: 40}}>检查更新</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => [
+                            this.setState({
+                                slideMoreMenuModal: false,
+                                aboutModal: true,
+                            }),
+                        ]}>
+                            <Text style={{fontSize: 15, lineHeight: 40}}>关于我们</Text>
+                        </TouchableOpacity>
+                    </View>
+                </Modal>
+                <Modal
+                    backdropColor='rgba(0, 0, 0, 0.1)'
+                    onBackdropPress={() => {
+                        this.setState({
+                            aboutModal: false,
+                        });
+                    }}
+                    isVisible={this.state.aboutModal}>
+                    <About/>
+                </Modal>
+
             </View>
         );
     }
@@ -133,6 +192,26 @@ class Home extends Component {
 
     imageLoaded() {
         this.setState({viewRef: findNodeHandle(this.backgroundImage)});
+    }
+
+
+    checkUpdate() {
+        CodePush.checkForUpdate()
+            .then((update) => {
+                if (!update) {
+                    Alert.alert('app是最新版了');
+                } else {
+                    CodePush.sync({
+                        updateDialog: {
+                            optionalIgnoreButtonLabel: '稍后',
+                            optionalInstallButtonLabel: '后台更新',
+                            optionalUpdateMessage: '有新版本了，是否更新？',
+                            title: '更新提示',
+                        },
+                        installMode: CodePush.InstallMode.IMMEDIATE,
+                    });
+                }
+            });
     }
 
 
@@ -171,4 +250,5 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 0, left: 0, bottom: 0, right: 0,
     },
+
 });

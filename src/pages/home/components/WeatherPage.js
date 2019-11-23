@@ -3,7 +3,7 @@ import {
     ScrollView,
     Button,
     StyleSheet,
-    RefreshControl,
+    RefreshControl, Text,
 } from 'react-native';
 import {connect} from 'react-redux';
 import BasicWeather from './BasicWeather';
@@ -43,7 +43,7 @@ class WeatherPage extends Component {
                     <View animation="fadeInLeft" delay={3000} style={{height: 250}}>
                         <HourWeather/>
                     </View>
-                    <View  animation="fadeInLeft" delay={3000} style={{height: 300}}>
+                    <View animation="fadeInLeft" delay={3000} style={{height: 300}}>
                         <DailyForecastList/>
                     </View>
                     <View>
@@ -54,6 +54,9 @@ class WeatherPage extends Component {
                     </View>
                     <View>
                         <Lifestyle/>
+                    </View>
+                    <View style={{alignItems: 'center'}}>
+                        <Text style={{fontSize: 14, color: '#FFFFFF'}}>数据来自于和风天气</Text>
                     </View>
                 </ScrollView>
             </View>

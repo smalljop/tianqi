@@ -1,4 +1,5 @@
-/*a {*/
-/*    top: 1px;*/
-/*    border: 1px solid #FFFFFF;*/
-/*}*/
+a {
+    top: 1px;
+    border: 1px solid #FFFFFF;
+    position: relative;
+}

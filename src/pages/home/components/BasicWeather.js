@@ -9,6 +9,7 @@ import {connect} from 'react-redux';
 import ShiDu from 'src/static/svg/weather/basic/ShiDu.svg';
 import Feng from 'src/static/svg/weather/basic/Feng.svg';
 import WenDu from 'src/static/svg/weather/basic/WenDu.svg';
+import WeatherSpeech from './WeatherSpeech';
 import {scaleSize} from 'src/utils/ScreenUtil';
 
 class BasicWeather extends Component {
@@ -30,9 +31,12 @@ class BasicWeather extends Component {
                     </Text>
                 </View>
                 <View style={styles.temperatureContainer}>
-                    <Text style={{}}>
-                        <Text style={{fontSize: 60}}> {nowWeather.now.tmp}</Text>℃
-                    </Text>
+                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                        <Text style={{}}>
+                            <Text style={{fontSize: 60}}> {nowWeather.now.tmp}</Text>℃
+                        </Text>
+                        <WeatherSpeech style={{alignItems: 'center'}}/>
+                    </View>
                     <Text style={{alignSelf: 'center'}}> {nowWeather.now.cond_txt}</Text>
                 </View>
                 <View style={styles.extWeatherContainer}>

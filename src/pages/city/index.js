@@ -136,6 +136,7 @@ class CityManager extends Component {
             payload => {
                 if (payload.type === 'willFocus') {
                     AsyncStorageUtil.get('cityList').then(data => {
+                        console.log(data);
                         setTimeout(() => {
                             this.setState({
                                 cityList: data,
@@ -178,8 +179,8 @@ const styles = StyleSheet.create({
     },
     rowFront: {
         margin: 10,
-        alignItems: 'center',
-        marginLeft: 75,
+        alignItems: 'flex-start',
+        marginLeft: 30,
         backgroundColor: '#ffffff',
         justifyContent: 'center',
         height: 50,
